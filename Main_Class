@@ -62,7 +62,7 @@ class LibraryFront {
               echo "Connection failed: " . $e->getMessage();
           }
     }
-    public function getCustomer($custome) {
+    public function getCustomer($customer) {
       try {
         $statement = $this->connection->prepare('SELECT * FROM customers WHERE ID = :id LIMIT 1');
         $statement->execute([
@@ -149,4 +149,21 @@ class LibraryFront {
   private function requestDate(): DateTime {
     return (new DateTime())->add(new DateInterval('P3W'));
   }
-
+// }
+//
+// Class LibraryBack{
+//   public $librarian = array(1 => "juffr. in de Hoogte", 2 => "juffr. Laagland", 3 => "jonkheer Bodegraven tot Veerle");
+//   // public $librarianDuty = $_GET
+//   public function stamp($catalog, $librarianDuty){
+//     echo "Stempel is gezet door ".$librarianDuty.".<br>";
+//     }
+//   public function acceptReturn($catalog,$librarianDuty){
+//     echo "Boek is retour genomen door ".$librarianDuty.".<br>";
+//     }
+//   // public function addToCatalog($catalog){
+//   //   //input via form array_push($_GET, $catalog);
+//   //   }
+//   // public function addCustomer($customer){
+//   //   //input via form array_push($_GET, $customer);
+//   //   }
+  }
