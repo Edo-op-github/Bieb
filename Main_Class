@@ -1,0 +1,152 @@
+<?php
+class LibraryFront {
+  public $host = "localhost";
+  public $username = "root";
+  public $database = "library-hw";
+  private $connection;
+
+  public $available = [];
+  public $unavailable = [];
+
+
+  public function __construct() {
+    $this->connection = new PDO("mysql:host=$this->host;dbname=$this->database", $this->username);
+    $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  }
+  public function getCatalog(){
+    try {
+      $sql = "SELECT * FROM `catalog`";
+      $statement = $this->connection->prepare($sql);
+      $statement->execute();
+      $resultsCatalog = $statement->fetchAll(PDO::FETCH_ASSOC);
+      return $resultsCatalog;
+    }
+    catch(PDOException $e)
+    {
+        echo "Connection failed: " . $e->getMessage();
+    }
+  }
+
+  public function getBook($bookId) {
+    try {
+      $statement = $this->connection->prepare('SELECT * FROM catalog WHERE ID = :id LIMIT 1');
+      $statement->execute([
+        'id' => $bookId
+      ]);
+
+      $books = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+      if ($books) {
+        return $books[0];
+      }
+      else {
+        return null;
+      }
+
+    }
+    catch (PDOException $exception) {
+      return null;
+    }
+  }
+
+  public function getCustomers(){
+    try {
+              $sql = "SELECT * FROM `customers`";
+              $statement = $this->connection->prepare($sql);
+              $statement->execute();
+              $resultsCustomer = $statement->fetchAll(PDO::FETCH_ASSOC);
+              return $resultsCustomer;
+          }
+          catch(PDOException $e)
+          {
+              echo "Connection failed: " . $e->getMessage();
+          }
+    }
+    public function getCustomer($custome) {
+      try {
+        $statement = $this->connection->prepare('SELECT * FROM customers WHERE ID = :id LIMIT 1');
+        $statement->execute([
+          'id' => $customerID
+        ]);
+
+        $customers = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($customers) {
+          return $customers[0];
+        }
+        else {
+          return null;
+        }
+
+      }
+      catch (PDOException $exception) {
+        return null;
+      }
+    }
+
+//  public $customer = array("Janssen","de Vlieger","Hallegraef");
+
+
+  public function customerCheck($customerID) {
+    foreach($resultsCustomer as $cust){
+      $cust = strtolower($cust);
+      $customerID = strtolower($customerID);
+      if ($cust == $customerID){
+        echo ("Zoek uw boek uit.");
+        break;
+      }
+      else {
+        echo ("Uw naam is niet bekend in ons klantenbestand. Registreer u bij de balie.");
+      }
+    }
+  }
+
+  public function availableCheck(){
+    foreach ($resultsCatalog as $book){
+      if ($catalog('Borrowed_by') == ""){
+        $available += $book;
+      }
+      elseif ($catalog('Borrowed_by') != ""){
+        $unavailable += $book;
+      }
+    }
+  }
+
+  // public $bookReturn = $_GET
+  // public $customerID = $_GET
+  public function borrowBook($bookId, $customerID){
+      $book = $this->getBook($bookId);
+      if ($book === null) {
+        echo "Onbekend boek";
+        return;
+      }
+      if ($book['Borrowed_by'] == "0"){
+        try {
+          $statement = $this->connection->prepare('UPDATE catalog SET Borrowed_by = :customerID WHERE ID = :bookId');
+          $statement->execute([
+            ':customerID' => $customerID,
+            ':bookId' => 1
+          ]);
+          echo "Gefeliciteerd meneer/mevrouw .$customerID.! U heeft ".$book['Title']." geleend. Het wordt op ". $this->requestDate()->format('d M Y')." terug verwacht. <br>";
+        }
+        catch(PDOException $exception) {
+          echo $exception->getMessage();
+        }
+      }
+      else {
+        echo "Dit boek is helaas reeds uitgeleend. Kies een ander meesterwerk.<br>";
+      }
+  }
+//   public function returnBook($catalog, $bookReturn,$customerID){
+//     foreach ($catalog as $book){
+//       if ($bookReturn == $catalog['Title'] && $catalog['Borrowed_by' != ""]){
+//         acceptReturn($catalog,$librarianDuty);
+//         echo "Dank u wel, meneer/mevrouw ".$customerID.", voor het retourneren van ".$book.". <br>";
+//         return $catalog['Borrowed_by'] = "";
+//       }
+//     }
+//   }
+  private function requestDate(): DateTime {
+    return (new DateTime())->add(new DateInterval('P3W'));
+  }
+
