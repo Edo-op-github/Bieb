@@ -1,0 +1,43 @@
+<?php
+require 'LibraryFront.php';
+$library = new LibraryFront();
+$catalog = $library->getCatalog();
+?>
+
+
+<html>
+<head></head>
+<body bgcolor="33beff">
+  <form action="/dingen.php" method="post">
+    Voer uw achternaam in.
+    <input type="text" name="customerName">
+    <input type="submit" value="Verzenden">
+  </form>
+<br>
+  Kies hier het boek dat u wilt lenen:
+<form method="post" action="/requestBook.php" name="bookRequest">
+<select name="requestedId">
+  <?php
+  foreach ($catalog as $book){
+    if ($book['Borrowed_by'] == 0) {
+      echo '<option value="' . $book['ID'] . '">' . $book['Title'] . '</option>';
+    }
+  }
+  ?>
+</option>
+</select>
+<button type="submit">Kies</button>
+</form>
+<br>
+Momenteel uitgeleend zijn:
+<select>
+  <?php
+  foreach ($catalog as $book){
+    if ($book['Borrowed_by'] != 0) {
+      echo '<option value="' . $book['ID'] . '">' . $book['Title'] . '</option>';
+    }
+  }
+  ?>
+</select>
+</body>
+<html>
